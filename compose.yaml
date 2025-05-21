@@ -32,13 +32,7 @@ services:
         published: ${HTTP3_PORT:-4434}
         protocol: udp
         
-  adminer:
-    image: adminer
-    restart: always
-    ports:
-      - 8081:8080
-    networks:
-      - app_network
+
 
 # Mercure is installed as a Caddy module, prevent the Flex recipe from installing another service
 ###> symfony/mercure-bundle ###
