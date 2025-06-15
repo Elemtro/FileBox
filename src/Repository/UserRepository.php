@@ -8,45 +8,38 @@ use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Uid\Uuid;
 
-class UserRepository extends ServiceEntityRepository
+class UserRepository extends ServiceEntityRepository 
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, File::class);
     }
-
     /**
-     * Finds files uploaded by a specific user using Doctrine Query Builder (DQL).
+     * Finds a User by their email address.
+     * This is a common custom method you might add to a UserRepository.
      *
-     * @param User $user The User entity whose files to retrieve.
-     * @return File[] Returns an array of File objects.
+     * @param string $email The email address to search for.
+     * @return User|null The User entity if found, otherwise null.
      */
-    public function findByUser(User $user): array
+    public function findOneByEmail(string $email): ?User
     {
-        return $this->createQueryBuilder('f') // Alias 'f' for the File entity
-            ->andWhere('f.user = :user')     // Filter by the 'user' relationship (entity property)
-            ->setParameter('user', $user)    // Pass the User entity object directly as a parameter
-            ->orderBy('f.uploadedAt', 'DESC') // Order results by 'uploadedAt' property in descending order
-            ->getQuery()                     // Get the DQL Query object
-            ->getResult();                   // Execute the query and get all results
+        return $this->createQueryBuilder('u') // 'u' is an alias for the User entity
+            ->andWhere('u.email = :val')     // Add a WHERE clause for the email field
+            ->setParameter('val', $email)    // Set the value for the ':val' parameter
+            ->getQuery()                     // Get the Doctrine Query object
+            ->getOneOrNullResult();          // Execute the query and get one result or null
     }
-
     /**
-     * Finds a specific file by its original filename for a given user using DQL.
-     * This leverages the unique constraint defined in the File entity.
+     * Finds a User by their UUID.
+     * While find() works with UUIDs, a dedicated method can improve clarity.
      *
-     * @param string $originalFilename The original filename of the file.
-     * @param User $user The User entity who owns the file.
-     * @return File|null The File entity if found, otherwise null.
+     * @param Uuid $uuid The UUID object to search for.
+     * @return User|null The User entity if found, otherwise null.
      */
-    public function findOneByOriginalFilenameAndUser(string $originalFilename, User $user): ?File
+    public function findOneByUuid(Uuid $uuid): ?User
     {
-        return $this->createQueryBuilder('f')
-            ->andWhere('f.originalFilename = :filename') // Filter by 'originalFilename' property
-            ->andWhere('f.user = :user')                 // Filter by 'user' relationship
-            ->setParameter('filename', $originalFilename) // Bind filename value
-            ->setParameter('user', $user)                // Bind User entity object
-            ->getQuery()
-            ->getOneOrNullResult();
+        // Doctrine's find() method can often handle primary keys directly.
+        // For UUIDs, ensure your DBAL setup is correct.
+        return $this->find($uuid);
     }
 }

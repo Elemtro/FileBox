@@ -6,13 +6,14 @@ namespace App\Entity;
 use App\Repository\FileRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
-use Doctrine\DBAL\Types\Types; // Import Types for 'uuid' and 'datetime_immutable' mapping
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Symfony\Component\Validator\Constraints as Assert; // For validation constraints
+use Doctrine\DBAL\Types\Types;
+// NO Validation Annotations or their use statements here
+// REMOVED: use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+// REMOVED: use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FileRepository::class)]
 #[ORM\Table(name: 'file')]
-#[UniqueEntity(fields: ['originalFilename', 'user'], message: 'A file with this name already exists for this user.')]
+// REMOVED: #[UniqueEntity(...)]
 class File
 {
     #[ORM\Id]
@@ -20,36 +21,28 @@ class File
     private ?Uuid $fileUuid = null;
 
     #[ORM\ManyToOne(targetEntity: User::class)] // Many-to-one relationship with User
-    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'uuid')] // <<<--- ADD THIS PART
-    private ?User $user = null; // This will hold the User entity, Doctrine handles the user_uuid foreign key
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'uuid')] // Correct foreign key reference
+    private ?User $user = null; // This will hold the User entity
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'Original filename cannot be blank.')]
-    #[Assert\Length(max: 255, maxMessage: 'Original filename cannot be longer than {{ limit }} characters.')]
     private ?string $originalFilename = null;
 
-    #[ORM\Column(type: Types::BIGINT)] // Use BIGINT for file size to accommodate large files
-    #[Assert\NotBlank(message: 'File size cannot be blank.')]
-    #[Assert\PositiveOrZero(message: 'File size must be a positive number or zero.')]
+    #[ORM\Column(type: Types::BIGINT)]
     private ?int $size = null;
 
     #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: 'MIME type cannot be blank.')]
-    #[Assert\Length(max: 255, maxMessage: 'MIME type cannot be longer than {{ limit }} characters.')]
-    private ?string $mimeType = null; // Suggested: Stores the file's MIME type (e.g., 'image/jpeg')
+    private ?string $mimeType = null;
 
-    #[ORM\Column(length: 255, unique: true)] // Suggested: Path where the file is physically stored
-    #[Assert\NotBlank(message: 'Storage path cannot be blank.')]
-    #[Assert\Length(max: 255, maxMessage: 'Storage path cannot be longer than {{ limit }} characters.')]
+    #[ORM\Column(length: 255, unique: true)] // Database-level unique constraint
     private ?string $storagePath = null;
 
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)] // Suggested: Timestamp of when the file was uploaded
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $uploadedAt = null;
 
     public function __construct()
     {
-        $this->fileUuid = Uuid::v4(); // Generate a new UUID for the file
-        $this->uploadedAt = new \DateTimeImmutable(); // Set the upload timestamp
+        $this->fileUuid = Uuid::v4();
+        $this->uploadedAt = new \DateTimeImmutable();
     }
 
     public function getFileUuid(): ?Uuid
@@ -76,8 +69,6 @@ class File
 
     public function setOriginalFilename(string $originalFilename): static
     {
-        $this->originalFilename = $originalFilename;
-
         return $this;
     }
 
@@ -88,8 +79,6 @@ class File
 
     public function setSize(int $size): static
     {
-        $this->size = $size;
-
         return $this;
     }
 
@@ -100,8 +89,6 @@ class File
 
     public function setMimeType(string $mimeType): static
     {
-        $this->mimeType = $mimeType;
-
         return $this;
     }
 
@@ -112,8 +99,6 @@ class File
 
     public function setStoragePath(string $storagePath): static
     {
-        $this->storagePath = $storagePath;
-
         return $this;
     }
 
@@ -124,8 +109,6 @@ class File
 
     public function setUploadedAt(\DateTimeImmutable $uploadedAt): static
     {
-        $this->uploadedAt = $uploadedAt;
-
         return $this;
     }
 }

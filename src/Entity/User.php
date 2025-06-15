@@ -3,44 +3,43 @@
 namespace App\Entity;
 
 use App\Repository\UserRepository;
-use Symfony\Component\Uid\Uuid;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\DBAL\Types\Types; // Import Types for 'uuid' and 'datetime_immutable' mapping
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity; // Needed for unique email validation
+use Symfony\Component\Uid\Uuid;
+use Doctrine\DBAL\Types\Types;
+// NO Validation Annotations or their use statements here
+// REMOVED: use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
+use Symfony\Component\Security\Core\User\UserInterface;
+// REMOVED: use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email.')] // Added for unique email constraint
-class User
+// REMOVED: #[UniqueEntity(...)]
+class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
-    // Removed #[ORM\GeneratedValue] as UUIDs are generated manually in the constructor
-    #[ORM\Column(type: Types::GUID, unique: true)] // Correct Doctrine type for UUID
+    #[ORM\Column(type: Types::GUID, unique: true)]
     private ?Uuid $uuid = null;
 
-    // The 'ID' property was removed as 'uuid' serves as the primary key.
-
-    #[ORM\Column(length: 70, unique: true)] // Added unique: true for the email to enforce uniqueness at the database level
+    #[ORM\Column(length: 70, unique: true)] // Database-level unique constraint
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
 
-    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)] // Correct Doctrine type for DateTimeImmutable objects
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
     private ?\DateTimeImmutable $createdAt = null;
 
     public function __construct()
     {
-        $this->uuid = Uuid::v4(); // Automatically generate a UUID when a new User object is created
-        $this->createdAt = new \DateTimeImmutable(); // Set the creation timestamp
+        $this->uuid = Uuid::v4();
+        $this->createdAt = new \DateTimeImmutable();
     }
 
-    public function getUuid(): ?Uuid // Renamed from getId() to getUuid() to reflect the UUID primary key
+    public function getUuid(): ?Uuid
     {
         return $this->uuid;
     }
-
-    // The setID() method was removed as the ID property is no longer present.
 
     public function getEmail(): ?string
     {
@@ -54,6 +53,9 @@ class User
         return $this;
     }
 
+    /**
+     * @see PasswordAuthenticatedUserInterface
+     */
     public function getPassword(): ?string
     {
         return $this->password;
@@ -62,19 +64,43 @@ class User
     public function setPassword(string $password): static
     {
         $this->password = $password;
-
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable // Renamed from getDateTimeImmutable() to getCreatedAt()
+    public function getCreatedAt(): ?\DateTimeImmutable
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): static // Added the missing setter for createdAt
+    public function setCreatedAt(\DateTimeImmutable $createdAt): static
     {
-        $this->createdAt = $createdAt;
-
         return $this;
+    }
+
+    // --- Methods required by UserInterface ---
+
+    /**
+     * @see UserInterface
+     */
+    public function getUserIdentifier(): string
+    {
+        return (string) $this->email;
+    }
+
+    /**
+     * @see UserInterface
+     * @return string[]
+     */
+    public function getRoles(): array
+    {
+        return ['ROLE_USER'];
+    }
+
+    /**
+     * @see UserInterface
+     */
+    public function eraseCredentials(): void
+    {
+        // Clear sensitive data (like plain password if it were stored temporarily)
     }
 }
