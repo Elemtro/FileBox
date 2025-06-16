@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250615200414 extends AbstractMigration
+final class Version20250616171703 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -26,11 +26,6 @@ final class Version20250615200414 extends AbstractMigration
         $this->addSql(<<<'SQL'
             CREATE UNIQUE INDEX UNIQ_8C9F3610279401A ON file (storage_path)
         SQL);
-        // <<< MANUALLY ADDED: COMPOSITE UNIQUE INDEX FOR (original_filename, user_id) >>>
-        $this->addSql(<<<'SQL'
-            CREATE UNIQUE INDEX UNIQ_FILE_ORIGINAL_FILENAME_USER ON file (original_filename, user_id)
-        SQL);
-        // <<< END MANUALLY ADDED LINE >>>
         $this->addSql(<<<'SQL'
             CREATE INDEX IDX_8C9F3610A76ED395 ON file (user_id)
         SQL);
@@ -38,7 +33,7 @@ final class Version20250615200414 extends AbstractMigration
             COMMENT ON COLUMN file.uploaded_at IS '(DC2Type:datetime_immutable)'
         SQL);
         $this->addSql(<<<'SQL'
-            CREATE TABLE "user" (uuid UUID NOT NULL, email VARCHAR(70) NOT NULL, password VARCHAR(255) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(uuid))
+            CREATE TABLE "user" (uuid UUID NOT NULL, email VARCHAR(70) NOT NULL, password VARCHAR(255) NOT NULL, role VARCHAR(255) NOT NULL, created_at TIMESTAMP(0) WITHOUT TIME ZONE NOT NULL, PRIMARY KEY(uuid))
         SQL);
         $this->addSql(<<<'SQL'
             CREATE UNIQUE INDEX UNIQ_8D93D649E7927C74 ON "user" (email)
@@ -54,10 +49,9 @@ final class Version20250615200414 extends AbstractMigration
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
-        // <<< MANUALLY REMOVED: CREATE SCHEMA public >>>
-        // $this->addSql(<<<'SQL'
-        //     CREATE SCHEMA public
-        // SQL);
+        $this->addSql(<<<'SQL'
+            CREATE SCHEMA public
+        SQL);
         $this->addSql(<<<'SQL'
             ALTER TABLE file DROP CONSTRAINT FK_8C9F3610A76ED395
         SQL);
@@ -67,10 +61,5 @@ final class Version20250615200414 extends AbstractMigration
         $this->addSql(<<<'SQL'
             DROP TABLE "user"
         SQL);
-        // <<< MANUALLY ADDED: DROP COMPOSITE UNIQUE INDEX >>>
-        $this->addSql(<<<'SQL'
-            DROP INDEX UNIQ_FILE_ORIGINAL_FILENAME_USER
-        SQL);
-        // <<< END MANUALLY ADDED LINE >>>
     }
 }

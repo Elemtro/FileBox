@@ -1,33 +1,30 @@
-# config/services.yaml
 parameters:
     locale: 'en'
 
 services:
-    # default configuration for services in this file
     _defaults:
-        autowire: true      # Automatically injects dependencies
-        autoconfigure: true # Automatically registers services as commands, event subscribers, etc.
-        public: false       # Services are not directly accessible from the container.
+        autowire: true
+        autoconfigure: true
+        public: false
 
     # Makes classes in src/ available to be used as services.
     # This creates a service per class whose id is the fully-qualified class name.
     App\:
         resource: '../src/'
-        exclude: '../src/{DependencyInjection,Entity,Migrations,Tests,Kernel.php}'
+        exclude:
+            - '../src/DependencyInjection/'
+            - '../src/Storage/Entity/'
+            - '../src/Kernel.php'
+            - '../src/Tests/'
+    Symfony\Component\HttpFoundation\Session\SessionInterface:
+        alias: 'session'
 
-    # Custom User Provider configuration
-    # This explicitly registers your custom UserProvider as a service,
-    # ensuring it's available for injection and can be referenced in security.yaml
-    App\Security\UserProvider:
-        arguments:
-            $userRepository: '@App\Repository\UserRepository'
-            # $passwordHasher is autowired by default due to autowire: true
-            # but you can explicitly define it if needed for clarity:
-            # $passwordHasher: '@Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface'
+    App\Api\Service\:
+        resource: '../src/api/service'
 
-    # Controllers are imported separately to have a smaller default scope
-    App\Controller\:
-        resource: '../src/Controller'
+    App\Api\Controller\:
+        resource: '../src/api/controller'
         tags: ['controller.service_arguments']
 
-    # ... other services if you have them ...
+    App\Api\ArgumentResolver\DtoResolver:
+        tags: ['controller.argument_value_resolver']

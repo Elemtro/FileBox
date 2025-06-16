@@ -2,16 +2,10 @@
 security:
     # https://symfony.com/doc/current/security.html#where-do-users-come-from-user-providers
     providers:
-        # Point to your custom UserProvider service if you created one.
-        # This is the safest bet given previous UUID hydration issues.
         app_user_provider:
-            id: App\Security\UserProvider # Your custom user provider
-
-        # Or, if you've fully resolved UUID hydration issues and prefer standard Doctrine entity provider:
-        # app_user_provider:
-        #    entity:
-        #        class: App\Entity\User
-        #        property: email
+            entity:
+                class: App\Storage\Entity\User
+                property: email
 
     firewalls:
         dev:
@@ -21,19 +15,19 @@ security:
         main:
             pattern: ^/api/ # Still apply this firewall to all /api routes
 
-    access_control:
-        - { path: ^/api/login, roles: PUBLIC_ACCESS }
-        - { path: ^/api/register, roles: PUBLIC_ACCESS }
-        # For other /api routes, we will check session manually or use voters
-        # IS_AUTHENTICATED_FULLY relies on Symfony's internal token, which might not be set by manual login.
-        # You'll need to check the session in subsequent controllers for user authentication status.
-        # Example:
-        # - { path: ^/api/files, roles: ROLE_USER } # This would *not* work with purely manual session management
-        # It's better to explicitly check $session->get('user_uuid') in other API methods.
-        - { path: ^/api/me, roles: PUBLIC_ACCESS } # Allow /api/me to be accessed to check session manually
-        - { path: ^/api/users, roles: PUBLIC_ACCESS } # If you have other API paths
-        - { path: ^/api/files, roles: PUBLIC_ACCESS } # For now, allow access, check session inside controller methods
+    # access_control:
+    #     - { path: ^/api/login, roles: PUBLIC_ACCESS }
+    #     - { path: ^/api/register, roles: PUBLIC_ACCESS }
+    #     # For other /api routes, we will check session manually or use voters
+    #     # IS_AUTHENTICATED_FULLY relies on Symfony's internal token, which might not be set by manual login.
+    #     # You'll need to check the session in subsequent controllers for user authentication status.
+    #     # Example:
+    #     # - { path: ^/api/files, roles: ROLE_USER } # This would *not* work with purely manual session management
+    #     # It's better to explicitly check $session->get('user_uuid') in other API methods.
+    #     - { path: ^/api/me, roles: PUBLIC_ACCESS } # Allow /api/me to be accessed to check session manually
+    #     - { path: ^/api/users, roles: PUBLIC_ACCESS } # If you have other API paths
+    #     - { path: ^/api/files, roles: PUBLIC_ACCESS } # For now, allow access, check session inside controller methods
 
     password_hashers:
-        App\Entity\User:
+        App\Storage\Entity\User:
             algorithm: auto

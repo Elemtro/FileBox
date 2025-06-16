@@ -1,7 +1,7 @@
 <?php
 // src/Entity/File.php
 
-namespace App\Entity;
+namespace App\Storage\Entity;
 
 use App\Repository\FileRepository;
 use Doctrine\ORM\Mapping as ORM;
