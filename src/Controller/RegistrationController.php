@@ -28,7 +28,6 @@ class RegistrationController extends AbstractController
         Request $request,
         UserPasswordHasherInterface $passwordHasher,
         EntityManagerInterface $entityManager
-        // REMOVED: UserRepository $userRepository // No longer injected
     ): JsonResponse {
         $data = json_decode($request->getContent(), true);
 
@@ -50,18 +49,12 @@ class RegistrationController extends AbstractController
         if ($password === null || trim($password) === '') {
             $errorMessages[] = 'Password is required.';
         }
-        
-        // REMOVED: Manual check for unique email using repository:
-        // if (trim($email) !== '' && $userRepository->findOneBy(['email' => trim($email)])) {
-        //     $errorMessages[] = 'There is already an account with this email.';
-        // }
 
         // If any manual errors, return them (these are now only for presence and format)
         if (count($errorMessages) > 0) {
             return new JsonResponse(['message' => 'Validation failed', 'errors' => $errorMessages], JsonResponse::HTTP_BAD_REQUEST);
         }
         // --- END MINIMAL MANUAL VALIDATION CHECKS ---
-
 
         $user = new User();
         $user->setEmail(trim($email));

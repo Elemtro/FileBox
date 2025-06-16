@@ -6,25 +6,29 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\DBAL\Types\Types;
-// NO Validation Annotations or their use statements here
-// REMOVED: use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-// REMOVED: use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: '`user`')]
-// REMOVED: #[UniqueEntity(...)]
+// REMOVED: #[UniqueEntity(fields: ['email'], message: 'There is already an account with this email.')] // Removed again to simplify
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\Column(type: Types::GUID, unique: true)]
-    private ?Uuid $uuid = null;
+    // CHANGED: Property type to string to bypass hydration TypeError
+    private ?string $uuid = null; 
 
-    #[ORM\Column(length: 70, unique: true)] // Database-level unique constraint
+    #[ORM\Column(length: 70, unique: true)]
+    #[Assert\NotBlank(message: 'Email cannot be blank.')]
+    #[Assert\Email(message: 'The email "{{ value }}" is not a valid email address.')]
+    #[Assert\Length(max: 70, maxMessage: 'Your email cannot be longer than {{ limit }} characters.')]
     private ?string $email = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: 'Password cannot be blank.')]
+    #[Assert\Length(min: 8, max: 255, minMessage: 'Your password must be at least {{ limit }} characters long.')]
     private ?string $password = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
@@ -32,14 +36,38 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     public function __construct()
     {
-        $this->uuid = Uuid::v4();
+        // CHANGED: Store UUID as its string representation
+        $this->uuid = Uuid::v4()->toRfc4122(); 
         $this->createdAt = new \DateTimeImmutable();
     }
 
     public function getUuid(): ?Uuid
     {
-        return $this->uuid;
+        // NOW THE PRIMARY WAY TO GET A Uuid OBJECT: Convert the stored string to Uuid object
+        if (is_string($this->uuid)) {
+            try {
+                return Uuid::fromString($this->uuid);
+            } catch (\InvalidArgumentException $e) {
+                // Log the error: $this->logger->error('Invalid UUID string from DB: ' . $this->uuid);
+                return null; 
+            }
+        }
+        return null; // If $this->uuid is null or not a string, return null Uuid
     }
+
+    /**
+     * Set the UUID property. Only accepts string or null.
+     * Use this with caution, primarily for hydration by Doctrine.
+     *
+     * @param string|null $uuid
+     * @return static
+     */
+    public function setUuid(?string $uuid): static
+    {
+        $this->uuid = $uuid;
+        return $this;
+    }
+
 
     public function getEmail(): ?string
     {
@@ -64,6 +92,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     public function setPassword(string $password): static
     {
         $this->password = $password;
+
         return $this;
     }
 
@@ -76,8 +105,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this;
     }
-
-    // --- Methods required by UserInterface ---
 
     /**
      * @see UserInterface

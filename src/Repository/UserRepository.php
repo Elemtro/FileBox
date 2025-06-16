@@ -1,45 +1,64 @@
 <?php
+    // src/Repository/UserRepository.php
 
-namespace App\Repository;
+    namespace App\Repository;
 
-use App\Entity\File;
-use App\Entity\User;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\Uid\Uuid;
+    use App\Entity\User;
+    use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
+    use Doctrine\Persistence\ManagerRegistry;
+    use Symfony\Component\Uid\Uuid; // Still needed for Uuid::fromString()
 
-class UserRepository extends ServiceEntityRepository 
-{
-    public function __construct(ManagerRegistry $registry)
-    {
-        parent::__construct($registry, File::class);
-    }
     /**
-     * Finds a User by their email address.
-     * This is a common custom method you might add to a UserRepository.
+     * @extends ServiceEntityRepository<User>
      *
-     * @param string $email The email address to search for.
-     * @return User|null The User entity if found, otherwise null.
-     */
-    public function findOneByEmail(string $email): ?User
-    {
-        return $this->createQueryBuilder('u') // 'u' is an alias for the User entity
-            ->andWhere('u.email = :val')     // Add a WHERE clause for the email field
-            ->setParameter('val', $email)    // Set the value for the ':val' parameter
-            ->getQuery()                     // Get the Doctrine Query object
-            ->getOneOrNullResult();          // Execute the query and get one result or null
-    }
-    /**
-     * Finds a User by their UUID.
-     * While find() works with UUIDs, a dedicated method can improve clarity.
+     * This class provides methods to interact with the User entity in the database.
      *
-     * @param Uuid $uuid The UUID object to search for.
-     * @return User|null The User entity if found, otherwise null.
+     * @method User|null find($id, $lockMode = null, $lockVersion = null)
+     * @method User|null findOneBy(array $criteria, array $orderBy = null)
+     * @method User[]    findAll()
+     * @method User[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
      */
-    public function findOneByUuid(Uuid $uuid): ?User
+    class UserRepository extends ServiceEntityRepository
     {
-        // Doctrine's find() method can often handle primary keys directly.
-        // For UUIDs, ensure your DBAL setup is correct.
-        return $this->find($uuid);
+        public function __construct(ManagerRegistry $registry)
+        {
+            parent::__construct($registry, User::class);
+        }
+
+        /**
+         * Finds a User by their email address.
+         *
+         * @param string $email The email address to search for.
+         * @return User|null The User entity if found, otherwise null.
+         */
+        public function findOneByEmail(string $email): ?User
+        {
+            return $this->createQueryBuilder('u')
+                ->andWhere('u.email = :val')
+                ->setParameter('val', $email)
+                ->getQuery()
+                ->getOneOrNullResult();
+        }
+
+        /**
+         * Finds a User by their UUID string.
+         *
+         * @param string $uuidString The UUID string to search for.
+         * @return User|null The User entity if found, otherwise null.
+         */
+        public function findOneByUuid(string $uuidString): ?User
+        {
+            // Convert string to Uuid object before passing to find() if find() expects Uuid object
+            // If Doctrine's UuidType is correctly set up, find() might handle string directly.
+            // But explicitly converting is safer with string property type.
+            try {
+                $uuidObject = Uuid::fromString($uuidString);
+                return $this->find($uuidObject);
+            } catch (\InvalidArgumentException $e) {
+                // Log invalid UUID string if it occurs
+                // $this->logger->error('Invalid UUID string in findOneByUuid: ' . $uuidString);
+                return null;
+            }
+        }
     }
-}
+    
