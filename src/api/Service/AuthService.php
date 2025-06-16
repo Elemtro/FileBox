@@ -31,7 +31,7 @@ class AuthService
             throw new AuthenticationException('Invalid credentials.');
         }
 
-        $session->invalidate(); // Prevent session fixation
+        $session->invalidate();
         $session->start();
         $session->set('user_uuid', $user->getUuid()->toRfc4122());
 

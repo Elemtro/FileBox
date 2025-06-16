@@ -23,6 +23,17 @@ class AuthController extends AbstractController
         private readonly AuthService $service,
         private readonly TokenStorageInterface $tokenStorage
     ) {}
+    #[Route('/login', name: 'login_form', methods: ['GET'])]
+    public function showLoginForm(): Response
+    {
+        return $this->render('auth/login.html.twig');
+    }
+
+   #[Route('/register', name: 'register_form', methods: ['GET'])]
+    public function showRegisterForm(): Response
+    {
+        return $this->render('auth/register.html.twig');
+    }
 
     #[Route('/api/auth/login', name: 'api_login', methods: ['POST'])]
     public function login(LoginRequest $dto): JsonResponse
@@ -90,7 +101,7 @@ class AuthController extends AbstractController
         }
     }
 
-    #[Route('/api/auth/logout', name: 'api_logout', methods: ['POST'])]
+    #[Route('/api/auth/logout', name: 'api_logout', methods: ['GET'])]
     public function logout(): JsonResponse
     {
         $this->tokenStorage->setToken(null);
