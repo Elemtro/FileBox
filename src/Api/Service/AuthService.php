@@ -33,7 +33,7 @@ class AuthService
 
         $session->invalidate();
         $session->start();
-        $session->set('user_uuid', $user->getUuid()->toRfc4122());
+        $session->set('user_uuid', $user->getUuid());
 
         return $user;
     }

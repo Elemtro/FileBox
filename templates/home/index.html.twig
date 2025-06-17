@@ -35,10 +35,12 @@
 								KB</td>
 							<td>{{ file.uploadedAt|date('d.m.Y H:i') }}</td>
 							<td>
-								<a href="{{ asset(file.storagePath) }}" download>⬇️</a>
+								<form method="post" action="{{ path('file_download', {'storagePath': file.storagePath}) }}">
+									<button type="submit" class="btn download-btn">⬇️</button>
+								</form>
 							</td>
 							<td>
-								<form method="post" action="{{ path('file_delete', {'fileUuid': file.fileUuid}) }}" onsubmit="return confirm('Delete file?');">
+								<form method="post" action="{{ path('file_delete', {'storagePath': file.storagePath}) }}" onsubmit="return confirm('Delete file?');">
 									<button type="submit" class="btn delete-btn">🗑️</button>
 								</form>
 							</td>

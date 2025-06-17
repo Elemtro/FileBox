@@ -37,9 +37,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->createdAt = new \DateTimeImmutable();
     }
 
-    public function getUuid(): ?Uuid
+    public function getUuid(): ?string
     {
-        return is_string($this->uuid) ? Uuid::fromString($this->uuid) : null;
+        return $this->uuid;
     }
 
 

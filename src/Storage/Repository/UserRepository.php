@@ -3,9 +3,7 @@ namespace App\Storage\Repository;
 
 use App\Storage\Entity\User;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\ORM\EntityManager;
 use Doctrine\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
 
 class UserRepository extends ServiceEntityRepository

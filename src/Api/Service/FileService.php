@@ -5,9 +5,10 @@ namespace App\Api\Service;
 use App\Storage\Repository\FileRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 use App\Api\Service\UserService;
-use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
 use Symfony\Component\Filesystem\Filesystem;
-
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\ResponseHeaderBag;
 
 class FileService
 {
@@ -20,11 +21,35 @@ class FileService
     {
         return $this->fileRepository->findAllUserFiles($user);
     }
-    public function deleteFile($uuid, $path)
+    public function downloadFile($storagePath, $directory, $userUuid)
     {
-        $file = $this->fileRepository->findOneByFileUuid($uuid);
-        $storagePath = $file->getStoragePath();
-        $fullPath = $path . $storagePath;
+        $file = $this->fileRepository->findOneByUserUuidAndFilePath($userUuid, $storagePath);
+        if (!$file) {
+            throw new NotFoundHttpException('File not found.');
+        }
+        $fullPath = $directory . $userUuid . "/" . $storagePath;
+
+
+        if (!file_exists($fullPath)) {
+            throw new NotFoundHttpException('The file does not physically exist.');
+        }
+
+
+
+        $response = new BinaryFileResponse($fullPath);
+        $response->setContentDisposition(
+            ResponseHeaderBag::DISPOSITION_ATTACHMENT,
+            $file->getOriginalFilename()
+        );
+        return $response;
+    }
+    public function deleteFile($storagePath, $directory, $userUuid)
+    {
+        $file = $this->fileRepository->findOneByUserUuidAndFilePath($userUuid, $storagePath);
+        if (!$file) {
+            throw new NotFoundHttpException('File not found.');
+        }
+        $fullPath = $directory . $userUuid . "/" . $storagePath;
 
         $filesystem = new Filesystem();
         try {
@@ -44,8 +69,7 @@ class FileService
     {
 
         if ($file) {
-            $userFolder = $directory . '/' . $userUuid;
-
+            $userFolder = $directory . $userUuid;
             if (!is_dir($userFolder)) {
                 mkdir($userFolder, 0755, true);
             }
@@ -64,7 +88,7 @@ class FileService
                 'originalFilename' => $file->getClientOriginalName(),
                 'mimeType' => $file->getClientMimeType(),
                 'size' => $file->getSize(),
-                'storagePath' => 'uploads/' . $userUuid . '/' . $newFilename,
+                'storagePath' => $newFilename,
             ];
 
             $file->move(

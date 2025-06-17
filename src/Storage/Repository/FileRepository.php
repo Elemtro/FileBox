@@ -6,6 +6,7 @@ use App\Storage\Entity\File;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 use App\Storage\Entity\User;
+use Symfony\Component\Uid\Uuid;
 
 class FileRepository extends ServiceEntityRepository
 {
@@ -46,11 +47,23 @@ class FileRepository extends ServiceEntityRepository
             ->getQuery()
             ->getOneOrNullResult();
     }
-    public function deleteFile($file){
+    public function deleteFile($file)
+    {
         $entityManager = $this->getEntityManager();
-        
+
         $entityManager->remove($file);
         $entityManager->flush();
-
+    }
+    public function findOneByUserUuidAndFilePath(string $userUuid, string $storagePath): ?File
+    {
+        $userUuidObject = Uuid::fromString($userUuid);
+        return $this->createQueryBuilder('f')
+            ->join('f.user', 'u')
+            ->andWhere('u.uuid = :userUuid')
+            ->andWhere('f.storagePath = :storagePath')
+            ->setParameter('userUuid', $userUuidObject)
+            ->setParameter('storagePath', $storagePath)
+            ->getQuery()
+            ->getOneOrNullResult();
     }
 }

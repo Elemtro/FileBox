@@ -1,6 +1,6 @@
 parameters:
     locale: 'en'
-    uploads_directory: '%kernel.project_dir%/public/uploads'
+    uploads_directory: '%kernel.project_dir%/data/uploads/'
 
 services:
     _defaults:

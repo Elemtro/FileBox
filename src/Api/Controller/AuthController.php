@@ -61,7 +61,7 @@ class AuthController extends AbstractController
 
             return $this->json([
                 'message' => 'Login successful!',
-                'user_uuid' => $user->getUuid()->toRfc4122(),
+                'user_uuid' => $user->getUuid(),
                 'email' => $user->getEmail(),
                 'roles' => $user->getRoles(),
             ]);
