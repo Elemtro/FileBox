@@ -5,6 +5,8 @@ namespace App\Api\Service;
 use App\Storage\Repository\FileRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
 use App\Api\Service\UserService;
+use Symfony\Component\Filesystem\Exception\IOExceptionInterface;
+use Symfony\Component\Filesystem\Filesystem;
 
 
 class FileService
@@ -18,6 +20,26 @@ class FileService
     {
         return $this->fileRepository->findAllUserFiles($user);
     }
+    public function deleteFile($uuid, $path)
+    {
+        $file = $this->fileRepository->findOneByFileUuid($uuid);
+        $storagePath = $file->getStoragePath();
+        $fullPath = $path . $storagePath;
+
+        $filesystem = new Filesystem();
+        try {
+            if ($filesystem->exists($fullPath)) {
+                $filesystem->remove($fullPath);
+            }
+
+            $this->fileRepository->deleteFile($file);
+
+            return true;
+        } catch (\Exception $e) {
+            return false;
+        }
+    }
+
     public function uploadFile($file, $directory, $userUuid)
     {
 

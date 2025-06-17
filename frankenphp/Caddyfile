@@ -7,6 +7,10 @@
 		worker {
 			file ./public/index.php
 			env APP_RUNTIME Runtime\FrankenPhpSymfony\Runtime
+
+			env PHP_UPLOAD_MAX_FILESIZE 20M
+			env PHP_POST_MAX_SIZE 25M
+
 			{$FRANKENPHP_WORKER_CONFIG}
 		}
 	}

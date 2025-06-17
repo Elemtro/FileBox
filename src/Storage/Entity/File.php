@@ -40,9 +40,9 @@ class File
         $this->fileUuid = Uuid::v4()->toRfc4122();
         $this->uploadedAt = new \DateTimeImmutable();
     }
-    public function getUuid(): ?Uuid
+    public function getfileUuid(): ?string
     {
-        return is_string($this->fileUuid) ? Uuid::fromString($this->fileUuid) : null;
+        return $this->fileUuid;
     }
 
     public function getUser(): ?User

@@ -18,6 +18,7 @@ services:
     volumes:
       - caddy_data:/data
       - caddy_config:/config
+      - ./config/php.ini:/usr/local/etc/php/conf.d/uploads.ini
     ports:
       # HTTP
       - target: 80

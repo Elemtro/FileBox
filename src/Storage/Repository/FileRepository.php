@@ -16,10 +16,10 @@ class FileRepository extends ServiceEntityRepository
     public function findAllUserFiles($user)
     {
         return $this->createQueryBuilder('f')
-        ->andWhere('f.user = :user')
-        ->setParameter('user', $user)
-        ->getQuery()
-        ->getResult();
+            ->andWhere('f.user = :user')
+            ->setParameter('user', $user)
+            ->getQuery()
+            ->getResult();
     }
     public function saveFile($fileData, User $user): File
     {
@@ -37,5 +37,20 @@ class FileRepository extends ServiceEntityRepository
         $entityManager->flush();
 
         return $fileEntity;
+    }
+    public function findOneByFileUuid(string $fileUuid)
+    {
+        return $this->createQueryBuilder('f')
+            ->andWhere('f.fileUuid = :uuid')
+            ->setParameter('uuid', $fileUuid)
+            ->getQuery()
+            ->getOneOrNullResult();
+    }
+    public function deleteFile($file){
+        $entityManager = $this->getEntityManager();
+        
+        $entityManager->remove($file);
+        $entityManager->flush();
+
     }
 }

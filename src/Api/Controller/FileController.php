@@ -47,4 +47,17 @@ class FileController extends AbstractController
 
         return new RedirectResponse($this->generateUrl('upload_page'));
     }
+    #[Route('/api/file/delete/{fileUuid}', name: 'file_delete', methods: ['POST'])]
+    public function delete(Request $request, string $fileUuid): RedirectResponse
+    {
+        $userUuid = $this->authService->getSession()->get('user_uuid');
+        if (!$userUuid) {
+            return $this->redirectToRoute('login_form');
+        }
+        $path = $this->getParameter('kernel.project_dir') . '/public' .'/';
+        $this->fileService->deleteFile($fileUuid, $path);
+
+
+        return new RedirectResponse($this->generateUrl('api_home'));
+    }
 }
