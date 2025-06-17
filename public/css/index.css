@@ -1,57 +1,75 @@
+* {
+  padding: 0;
+  margin: 0;
+  box-sizing: border-box;
+}
+
 body {
-    background: #f0f4f8;
-    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100vh;
-    margin: 0;
-  }
-  .registration-form {
-    background: white;
-    padding: 30px 40px;
-    border-radius: 12px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-    width: 320px;
-  }
-  .registration-form h2 {
-    text-align: center;
-    margin-bottom: 25px;
-    color: #333;
-  }
-  .registration-form label {
-    display: block;
-    font-weight: 600;
-    margin-bottom: 8px;
-    color: #555;
-  }
-  .registration-form input[type="email"],
-  .registration-form input[type="password"] {
-    width: 100%;
-    padding: 12px 15px;
-    margin-bottom: 20px;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    font-size: 1rem;
-    transition: border-color 0.3s ease;
-  }
-  .registration-form input[type="email"]:focus,
-  .registration-form input[type="password"]:focus {
-    border-color: #4a90e2;
-    outline: none;
-  }
-  .registration-form button {
-    width: 100%;
-    padding: 12px;
-    background-color: #4a90e2;
-    color: white;
-    font-weight: 700;
-    font-size: 1.1rem;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  .registration-form button:hover {
-    background-color: #357ABD;
-  }
+  margin: 0;
+  padding: 0;
+  height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #e0f7fa, #80deea);
+  font-family: 'Segoe UI', sans-serif;
+}
+
+.form-container {
+  background: white;
+  padding: 2rem 2rem;
+  border-radius: 20px;
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-container h2 {
+  text-align: center;
+  margin-bottom: 0.5rem;
+  color: #00796b;
+}
+.form-container p {
+  text-align: center;
+  margin-top: 0.5rem;
+  color: #00796b;
+}
+
+.form-group {
+  margin-bottom: 1.2rem;
+}
+
+label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #333;
+  font-weight: 500;
+}
+
+input[type="password"],
+input[type="email"],
+button {
+  width: 100%;
+  padding: 0.75rem;
+  font-size: 1rem;
+  border-radius: 10px;
+  border: 1px solid #ccc;
+}
+
+input:focus {
+  border-color: #26a69a;
+  outline: none;
+}
+
+button {
+  background-color: #009688;
+  color: white;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s;
+  margin-top: 0.5rem;
+}
+
+button:hover {
+  background-color: #00796b;
+}

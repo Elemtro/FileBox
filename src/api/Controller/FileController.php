@@ -9,6 +9,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use App\Api\Service\FileService;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 
 class FileController extends AbstractController
 {
@@ -19,15 +20,18 @@ class FileController extends AbstractController
     #[Route('/file/upload', name: 'upload_page', methods: ['GET'])]
     public function uploadFile(): Response
     {
+        if (!($this->authService->getSession()->has('user_uuid'))) {
+            return $this->redirectToRoute('login_form');
+        }
         return $this->render('file/upload.html.twig');
     }
 
-    #[Route('/api/file/upload', name: 'file_upload')]
-    public function upload(Request $request): Response
+    #[Route('/api/file/upload', name: 'file_upload', methods: ['POST'])]
+    public function upload(Request $request): RedirectResponse
     {
         $userUuid = $this->authService->getSession()->get('user_uuid');
         if (!$userUuid) {
-            throw $this->createAccessDeniedException('You need to log in to access to files.');
+            return $this->redirectToRoute('login_form');
         }
         try {
             $file = $request->files->get('file');
@@ -41,6 +45,6 @@ class FileController extends AbstractController
         }
 
 
-        return $this->render('file/upload.html.twig');
+        return new RedirectResponse($this->generateUrl('upload_page'));
     }
 }

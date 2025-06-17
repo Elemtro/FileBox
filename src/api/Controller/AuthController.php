@@ -5,6 +5,7 @@ namespace App\Api\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
@@ -20,7 +21,7 @@ class AuthController extends AbstractController
     public function __construct(
         private readonly UserPasswordHasherInterface $passwordHasher,
         private readonly ValidatorInterface $validator,
-        private readonly AuthService $service,
+        private readonly AuthService $authService,
         private readonly TokenStorageInterface $tokenStorage
     ) {}
     #[Route('/login', name: 'login_form', methods: ['GET'])]
@@ -38,7 +39,7 @@ class AuthController extends AbstractController
     #[Route('/api/auth/login', name: 'api_login', methods: ['POST'])]
     public function login(LoginRequest $dto): JsonResponse
     {
-        if ($this->service->getSession()->has('user_uuid')) {
+        if ($this->authService->getSession()->has('user_uuid')) {
             return $this->json([
                 'message' => 'You are already logged in.'
             ], Response::HTTP_BAD_REQUEST);
@@ -56,7 +57,7 @@ class AuthController extends AbstractController
         }
 
         try {
-            $user = $this->service->login($dto);
+            $user = $this->authService->login($dto);
 
             return $this->json([
                 'message' => 'Login successful!',
@@ -90,7 +91,7 @@ class AuthController extends AbstractController
         }
 
         try {
-            $this->service->register($dto);
+            $this->authService->register($dto);
 
             return new JsonResponse(['message' => 'User registered successfully!'], JsonResponse::HTTP_CREATED);
         } catch (\Exception $e) {
@@ -102,11 +103,11 @@ class AuthController extends AbstractController
     }
 
     #[Route('/api/auth/logout', name: 'api_logout', methods: ['GET'])]
-    public function logout(): JsonResponse
+    public function logout(): RedirectResponse
     {
         $this->tokenStorage->setToken(null);
-        $this->service->logout();
+        $this->authService->logout();
 
-        return new JsonResponse(['message' => 'Logged out successfully!'], Response::HTTP_OK);
+        return new RedirectResponse($this->generateUrl('login_form'));
     }
 }

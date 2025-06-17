@@ -42,11 +42,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return is_string($this->uuid) ? Uuid::fromString($this->uuid) : null;
     }
 
-    public function setUuid(?string $uuid): static
-    {
-        $this->uuid = $uuid;
-        return $this;
-    }
 
     public function getEmail(): ?string
     {
@@ -86,7 +81,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return (string) $this->email;
     }
 
-     public function getRole(): UserRole
+    public function getRole(): UserRole
     {
         return $this->role;
     }
@@ -101,8 +96,5 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return [$this->role->value];
     }
 
-    public function eraseCredentials(): void
-    {
-        // Use to clear sensitive data (if needed)
-    }
+    public function eraseCredentials(): void {}
 }

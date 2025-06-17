@@ -8,12 +8,8 @@ use Doctrine\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\Uid\Uuid;
 
-/**
- * @extends ServiceEntityRepository<User>
- */
 class UserRepository extends ServiceEntityRepository
 {
-    private EntityManagerInterface $entityManager;
 
     public function __construct(ManagerRegistry $registry) {
         parent::__construct($registry, User::class);

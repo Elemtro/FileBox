@@ -40,6 +40,7 @@ class AuthService
 
     public function register(RegistrationRequest $dto): User
     {
+        $session = $this->getSession();
         $user = new User();
         $user->setEmail($dto->email);
         $user->setPassword(

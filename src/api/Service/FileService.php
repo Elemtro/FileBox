@@ -2,20 +2,28 @@
 // src/Service/FileService.php
 namespace App\Api\Service;
 
-
+use App\Storage\Repository\FileRepository;
 use Symfony\Component\HttpFoundation\RequestStack;
+use App\Api\Service\UserService;
 
 
 class FileService
 {
     public function __construct(
-        private readonly RequestStack $requestStack
+        private readonly RequestStack $requestStack,
+        private readonly FileRepository $fileRepository,
+        private readonly UserService $userService
     ) {}
-    public function uploadFile($file, $directory, $userUuid){
+    public function findAllUserFiles($user)
+    {
+        return $this->fileRepository->findAllUserFiles($user);
+    }
+    public function uploadFile($file, $directory, $userUuid)
+    {
 
         if ($file) {
             $userFolder = $directory . '/' . $userUuid;
-            
+
             if (!is_dir($userFolder)) {
                 mkdir($userFolder, 0755, true);
             }
@@ -29,10 +37,21 @@ class FileService
                 $newFilename = $safeFilename . '_' . $i . '.' . $extension;
                 $i++;
             }
+
+            $fileData = [
+                'originalFilename' => $file->getClientOriginalName(),
+                'mimeType' => $file->getClientMimeType(),
+                'size' => $file->getSize(),
+                'storagePath' => 'uploads/' . $userUuid . '/' . $newFilename,
+            ];
+
             $file->move(
-                    $userFolder,
-                    $newFilename);
+                $userFolder,
+                $newFilename
+            );
+
+            $user = $this->userService->findUserByUuid($userUuid);
+            $this->fileRepository->saveFile($fileData, $user);
         }
     }
-    
 }

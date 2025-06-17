@@ -1,43 +1,41 @@
 <?php
 
-namespace App\Repository;
+namespace App\Storage\Repository;
 
 use App\Storage\Entity\File;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use App\Storage\Entity\User;
 
-/**
- * @extends ServiceEntityRepository<File>
- */
 class FileRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, File::class);
     }
+    public function findAllUserFiles($user)
+    {
+        return $this->createQueryBuilder('f')
+        ->andWhere('f.user = :user')
+        ->setParameter('user', $user)
+        ->getQuery()
+        ->getResult();
+    }
+    public function saveFile($fileData, User $user): File
+    {
+        $fileEntity = new File();
 
-//    /**
-//     * @return File[] Returns an array of File objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('f')
-//            ->andWhere('f.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('f.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+        $fileEntity->setUser($user)
+            ->setOriginalFilename($fileData['originalFilename'])
+            ->setSize($fileData['size'])
+            ->setMimeType($fileData['mimeType'])
+            ->setStoragePath($fileData['storagePath'])
+            ->setUploadedAt(new \DateTimeImmutable());
+        $entityManager = $this->getEntityManager();
 
-//    public function findOneBySomeField($value): ?File
-//    {
-//        return $this->createQueryBuilder('f')
-//            ->andWhere('f.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+        $entityManager->persist($fileEntity);
+        $entityManager->flush();
+
+        return $fileEntity;
+    }
 }

@@ -1,0 +1,148 @@
+{% extends 'base.html.twig' %}
+
+{% block body %}
+  <div class="home-container">
+    <h2>Your Files</h2>
+
+    <div class="actions">
+      <a href="{{ path('upload_page') }}" class="btn upload-btn">Upload file</a>
+      <a href="{{ path('api_logout') }}" class="btn logout-btn">Logout</a>
+    </div>
+
+    {% for message in app.flashes('success') %}
+      <div class="alert success">{{ message }}</div>
+    {% endfor %}
+
+    {% if files is empty %}
+      <p class="no-files">You have no files. You can <a href="{{ path('file_upload') }}">upload file</a>.</p>
+    {% else %}
+      <table class="file-table">
+        <thead>
+          <tr>
+            <th>Name</th>
+            <th>Size</th>
+            <th>Upload</th>
+            <th>Date of upload</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for file in files %}
+            <tr>
+              <td>{{ file.originalFilename  }}</td>
+              <td>{{ (file.size / 1024)|number_format(2, '.', ' ') }} KB</td>
+              <td><a href="{{ asset(file.storagePath) }}" download>⬇️</a></td>
+              <td>{{ file.uploadedAt|date('d.m.Y H:i') }}</td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% endif %}
+  </div>
+{% endblock %}
+
+{% block stylesheets %}
+  <style>
+    body {
+  background: linear-gradient(135deg, #e0f7fa, #80deea);
+  font-family: 'Segoe UI', sans-serif;
+  padding: 2rem;
+}
+
+.home-container {
+  max-width: 800px;
+  margin: auto;
+  background: white;
+  padding: 2rem;
+  border-radius: 16px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+}
+
+h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  color: #00796b;
+}
+
+.actions {
+  display: flex;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1rem;
+}
+
+.btn {
+  display: inline-block;
+  padding: 0.5rem 1.25rem;
+  border-radius: 8px;
+  text-decoration: none;
+  font-weight: 600;
+  transition: background-color 0.3s ease;
+  cursor: pointer;
+  user-select: none;
+  text-align: center;
+  white-space: nowrap;
+}
+
+.upload-btn {
+  background-color: #009688;
+  color: white;
+}
+.upload-btn:hover {
+  background-color: #00796b;
+}
+
+.logout-btn {
+  background-color: #ef5350;
+  color: white;
+}
+.logout-btn:hover {
+  background-color: #c62828;
+}
+
+.alert.success {
+  background: #e0f2f1;
+  padding: 0.75rem;
+  color: #00695c;
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.no-files {
+  text-align: center;
+  font-size: 1.1rem;
+  color: #333;
+}
+
+.no-files a {
+  color: #00796b;
+  text-decoration: underline;
+}
+
+.file-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.file-table th,
+.file-table td {
+  padding: 0.75rem;
+  border-bottom: 1px solid #ccc;
+  text-align: left;
+}
+
+.file-table th {
+  background-color: #b2dfdb;
+  color: #004d40;
+}
+
+.file-table a {
+  color: #00897b;
+  font-size: 1.2rem;
+  text-decoration: none;
+}
+
+.file-table a:hover {
+  text-decoration: underline;
+}
+  </style>
+{% endblock %}

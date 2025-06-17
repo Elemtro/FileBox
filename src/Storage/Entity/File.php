@@ -3,26 +3,22 @@
 
 namespace App\Storage\Entity;
 
-use App\Repository\FileRepository;
+use App\Storage\Repository\FileRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Uid\Uuid;
 use Doctrine\DBAL\Types\Types;
-// NO Validation Annotations or their use statements here
-// REMOVED: use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-// REMOVED: use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: FileRepository::class)]
 #[ORM\Table(name: 'file')]
-// REMOVED: #[UniqueEntity(...)]
 class File
 {
     #[ORM\Id]
-    #[ORM\Column(type: Types::GUID, unique: true)] // Primary key: file_uuid
-    private ?Uuid $fileUuid = null;
+    #[ORM\Column(type: Types::GUID, unique: true)] 
+    private ?string $fileUuid = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class)] // Many-to-one relationship with User
-    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'uuid')] // Correct foreign key reference
-    private ?User $user = null; // This will hold the User entity
+    #[ORM\ManyToOne(targetEntity: User::class)] 
+    #[ORM\JoinColumn(nullable: false, referencedColumnName: 'uuid')] 
+    private ?User $user = null; 
 
     #[ORM\Column(length: 255)]
     private ?string $originalFilename = null;
@@ -33,7 +29,7 @@ class File
     #[ORM\Column(length: 255)]
     private ?string $mimeType = null;
 
-    #[ORM\Column(length: 255, unique: true)] // Database-level unique constraint
+    #[ORM\Column(length: 255, unique: true)] 
     private ?string $storagePath = null;
 
     #[ORM\Column(type: Types::DATETIME_IMMUTABLE)]
@@ -41,13 +37,12 @@ class File
 
     public function __construct()
     {
-        $this->fileUuid = Uuid::v4();
+        $this->fileUuid = Uuid::v4()->toRfc4122();
         $this->uploadedAt = new \DateTimeImmutable();
     }
-
-    public function getFileUuid(): ?Uuid
+    public function getUuid(): ?Uuid
     {
-        return $this->fileUuid;
+        return is_string($this->fileUuid) ? Uuid::fromString($this->fileUuid) : null;
     }
 
     public function getUser(): ?User
@@ -67,48 +62,57 @@ class File
         return $this->originalFilename;
     }
 
-    public function setOriginalFilename(string $originalFilename): static
-    {
-        return $this;
-    }
 
     public function getSize(): ?int
     {
         return $this->size;
     }
 
-    public function setSize(int $size): static
-    {
-        return $this;
-    }
 
     public function getMimeType(): ?string
     {
         return $this->mimeType;
     }
 
-    public function setMimeType(string $mimeType): static
-    {
-        return $this;
-    }
 
     public function getStoragePath(): ?string
     {
         return $this->storagePath;
     }
 
-    public function setStoragePath(string $storagePath): static
-    {
-        return $this;
-    }
 
     public function getUploadedAt(): ?\DateTimeImmutable
     {
         return $this->uploadedAt;
     }
 
+    public function setOriginalFilename(string $originalFilename): static
+    {
+        $this->originalFilename = $originalFilename;
+        return $this;
+    }
+
+    public function setSize(int $size): static
+    {
+        $this->size = $size;
+        return $this;
+    }
+
+    public function setMimeType(string $mimeType): static
+    {
+        $this->mimeType = $mimeType;
+        return $this;
+    }
+
+    public function setStoragePath(string $storagePath): static
+    {
+        $this->storagePath = $storagePath;
+        return $this;
+    }
+
     public function setUploadedAt(\DateTimeImmutable $uploadedAt): static
     {
+        $this->uploadedAt = $uploadedAt;
         return $this;
     }
 }
