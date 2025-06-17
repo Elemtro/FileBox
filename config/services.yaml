@@ -21,10 +21,10 @@ services:
         alias: 'session'
 
     App\Api\Service\:
-        resource: '../src/api/service'
+        resource: '../src/Api/Service'
 
     App\Api\Controller\:
-        resource: '../src/api/controller'
+        resource: '../src/Api/Controller'
         tags: ['controller.service_arguments']
 
     App\Api\ArgumentResolver\DtoResolver:
