@@ -55,6 +55,18 @@ if [ "$1" = 'frankenphp' ] || [ "$1" = 'php' ] || [ "$1" = 'bin/console' ]; then
 		if [ "$( find ./migrations -iname '*.php' -print -quit )" ]; then
 			php bin/console doctrine:migrations:migrate --no-interaction --all-or-nothing
 		fi
+
+USER_COUNT=$(php -r "
+    require 'vendor/autoload.php';
+    use Doctrine\DBAL\DriverManager;
+
+    \$conn = DriverManager::getConnection(['url' => getenv('DATABASE_URL')]);
+    echo \$conn->executeQuery('SELECT COUNT(*) FROM \"user\"')->fetchOne();
+")
+
+		if [ "$USER_COUNT" -eq 0 ]; then
+  			php bin/console doctrine:fixtures:load --no-interaction
+		fi
 	fi
 
 	setfacl -R -m u:www-data:rwX -m u:"$(whoami)":rwX var

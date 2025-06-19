@@ -1,0 +1,132 @@
+{# templates/file/upload.html.twig #}
+{% extends 'base.html.twig' %}
+
+{% block body %}
+  <div class="upload-container">
+    <h2>Upload file</h2>
+
+    {% for message in app.flashes('success') %}
+        <div class="alert success">{{ message }}</div>
+    {% endfor %}
+
+    {% for message in app.flashes('error') %}
+        <div class="alert error">{{ message }}</div>
+    {% endfor %}
+
+    <form action="{{ path('file_upload') }}" method="post" enctype="multipart/form-data">
+        <div class="form-group">
+            <label for="file">Choose file:</label>
+            <input type="file" id="file" name="file" required>
+        </div>
+        <div class="form-buttons">
+        <button type="submit" class="upload-btn">Upload</button>
+        <a href="{{ path('api_home') }}" class="btn back-btn">Back to Home</a>
+    </div>
+    </form>
+  </div>
+{% endblock %}
+
+{% block stylesheets %}
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      padding: 0;
+      font-family: 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #e0f7fa, #80deea);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+    }
+
+    .upload-container {
+      background: white;
+      padding: 2rem 3rem;
+      border-radius: 20px;
+      box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h2 {
+      text-align: center;
+      color: #00796b;
+      margin-bottom: 1.5rem;
+    }
+
+    .form-group {
+      margin-bottom: 1.2rem;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 0.5rem;
+      font-weight: 500;
+      color: #333;
+    }
+
+    input[type="file"] {
+      width: 100%;
+    }
+
+    .form-buttons {
+      display: flex;
+      justify-content: space-between;
+      gap: 1rem;
+    }
+
+    .upload-btn {
+      flex: 1;
+      background-color: #009688;
+      color: white;
+      border: none;
+      padding: 0.75rem;
+      border-radius: 10px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .upload-btn:hover {
+      background-color: #00796b;
+    }
+
+    .back-btn {
+      flex: 1;
+      display: inline-block;
+      text-align: center;
+      padding: 0.75rem;
+      background-color: #b2dfdb;
+      color: #004d40;
+      text-decoration: none;
+      border-radius: 10px;
+      font-size: 1rem;
+      transition: background-color 0.3s;
+    }
+
+    .back-btn:hover {
+      background-color: #80cbc4;
+    }
+
+    .alert {
+      padding: 0.75rem;
+      margin-bottom: 1rem;
+      border-radius: 8px;
+      font-weight: 500;
+    }
+
+    .alert.success {
+      background-color: #e0f2f1;
+      color: #00695c;
+    }
+
+    .alert.error {
+      background-color: #ffebee;
+      color: #c62828;
+    }
+  </style>
+{% endblock %}
