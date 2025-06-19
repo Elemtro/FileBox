@@ -4,7 +4,6 @@ namespace App\Api\Service;
 
 use App\Storage\Repository\UserRepository;
 
-
 class UserService
 {
     public function __construct(
