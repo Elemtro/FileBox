@@ -31,7 +31,7 @@ class FileRepository extends ServiceEntityRepository
             ->setSize($fileData['size'])
             ->setMimeType($fileData['mimeType'])
             ->setStoragePath($fileData['storagePath'])
-            ->setUploadedAt(new \DateTimeImmutable());
+            ->setUploadedAt(new \DateTimeImmutable('now', new \DateTimeZone('Europe/Warsaw')));
         $entityManager = $this->getEntityManager();
 
         $entityManager->persist($fileEntity);

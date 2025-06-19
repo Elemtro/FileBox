@@ -47,9 +47,11 @@ class FileController extends AbstractController
 
         return new RedirectResponse($this->generateUrl('upload_page'));
     }
-    #[Route('/api/file/delete/{storagePath}', name: 'file_delete', methods: ['POST'])]
-    public function delete(Request $request, string $storagePath): RedirectResponse
+    #[Route('/api/file/delete', name: 'file_delete', methods: ['POST'])]
+    public function delete(Request $request): RedirectResponse
     {
+        $storagePath = $request->request->get('storagePath');
+
         $userUuid = $this->authService->getSession()->get('user_uuid');
         if (!$userUuid) {
             return $this->redirectToRoute('login_form');
@@ -61,9 +63,11 @@ class FileController extends AbstractController
 
         return new RedirectResponse($this->generateUrl('api_home'));
     }
-    #[Route('/api/file/download/{storagePath}', name: 'file_download')]
-    public function download(string $storagePath, Request $request): Response
+    #[Route('/api/file/download', name: 'file_download', methods: ['POST'])]
+    public function download(Request $request): Response
     {
+        $storagePath = $request->request->get('storagePath');
+
         $userUuid = $this->authService->getSession()->get('user_uuid');
         if (!$userUuid) {
             return $this->redirectToRoute('login_form');

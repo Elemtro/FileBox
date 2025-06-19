@@ -27,7 +27,7 @@ class FileService
         if (!$file) {
             throw new NotFoundHttpException('File not found.');
         }
-        $fullPath = $directory . $userUuid . "/" . $storagePath;
+        $fullPath = $directory . $storagePath;
 
 
         if (!file_exists($fullPath)) {
@@ -49,7 +49,7 @@ class FileService
         if (!$file) {
             throw new NotFoundHttpException('File not found.');
         }
-        $fullPath = $directory . $userUuid . "/" . $storagePath;
+        $fullPath = $directory . $storagePath;
 
         $filesystem = new Filesystem();
         try {
@@ -88,7 +88,7 @@ class FileService
                 'originalFilename' => $file->getClientOriginalName(),
                 'mimeType' => $file->getClientMimeType(),
                 'size' => $file->getSize(),
-                'storagePath' => $newFilename,
+                'storagePath' => $userUuid . '/' . $newFilename,
             ];
 
             $file->move(
