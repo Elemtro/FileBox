@@ -1,0 +1,254 @@
+{
+	"info": {
+		"_postman_id": "c1f2e3d4-a5b6-7c8d-9e0f-1a2b3c4d5e6f",
+		"name": "FileBox API",
+		"description": "Kolekcja Postman dla projektu Symfony PHP, zawierająca punkty końcowe autoryzacji i zarządzania plikami.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_collection_id": "c1f2e3d4-a5b6-7c8d-9e0f-1a2b3c4d5e6f"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Register User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testuser@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/register",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"register"
+							]
+						},
+						"description": "Rejestruje nowego użytkownika w systemie."
+					},
+					"response": []
+				},
+				{
+					"name": "Login User",
+					"event": [
+						{
+							"listen": "prerequest",
+							"script": {
+								"exec": [
+									"// Cookies are automatically managed by Postman for session-based authentication."
+								],
+								"type": "text/javascript"
+							}
+						},
+						{
+							"listen": "test",
+							"script": {
+								"exec": [
+									"pm.test(\"Status code is 200\", function () {",
+									"    pm.response.to.have.status(200);",
+									"});",
+									"",
+									"pm.test(\"Login successful message\", function () {",
+									"    pm.expect(pm.response.json().message).to.eql(\"Logowanie udane!\");",
+									"});"
+								],
+								"type": "text/javascript"
+							}
+						}
+					],
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n    \"email\": \"testuser@example.com\",\n    \"password\": \"password123\"\n}"
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/login",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"login"
+							]
+						},
+						"description": "Loguje istniejącego użytkownika i ustanawia sesję (cookies są zarządzane automatycznie przez Postman)."
+					},
+					"response": []
+				},
+				{
+					"name": "Logout User",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{baseUrl}}/api/auth/logout",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"auth",
+								"logout"
+							]
+						},
+						"description": "Wylogowuje użytkownika, unieważniając jego sesję."
+					},
+					"response": []
+				}
+			]
+		},
+		{
+			"name": "File Management (Requires Login)",
+			"item": [
+				{
+					"name": "Upload File",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "multipart/form-data",
+								"disabled": true
+							}
+						],
+						"body": {
+							"mode": "formdata",
+							"formdata": [
+								{
+									"key": "file",
+									"type": "file",
+									"src": "/C:/path/to/your/file.txt",
+									"description": "Wybierz plik do przesłania. Zastąp ścieżkę pliku rzeczywistą ścieżką na Twoim komputerze."
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/file/upload",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"file",
+								"upload"
+							]
+						},
+						"description": "Przesyła plik na serwer. **Pamiętaj, aby edytować ścieżkę do pliku w zakładce 'body' -> 'formdata'.**"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete File",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "storagePath",
+									"value": "user-uuid/nazwa_pliku.roz",
+									"description": "Ścieżka do usunięcia pliku. Musi być zgodna ze storagePath pliku zapisanego w bazie danych. (np. uuid-użytkownika/nazwa_pliku.roz)",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/file/delete",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"file",
+								"delete"
+							]
+						},
+						"description": "Usuwa plik ze wskazaną ścieżką. Wymaga zalogowania."
+					},
+					"response": []
+				},
+				{
+					"name": "Download File",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/x-www-form-urlencoded"
+							}
+						],
+						"body": {
+							"mode": "urlencoded",
+							"urlencoded": [
+								{
+									"key": "storagePath",
+									"value": "user-uuid/nazwa_pliku.roz",
+									"description": "Ścieżka do pobrania pliku. Musi być zgodna ze storagePath pliku zapisanego w bazie danych. (np. uuid-użytkownika/nazwa_pliku.roz)",
+									"type": "text"
+								}
+							]
+						},
+						"url": {
+							"raw": "{{baseUrl}}/api/file/download",
+							"host": [
+								"{{baseUrl}}"
+							],
+							"path": [
+								"api",
+								"file",
+								"download"
+							]
+						},
+						"description": "Pobiera plik o wskazanej ścieżce. Wymaga zalogowania."
+					},
+					"response": []
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
